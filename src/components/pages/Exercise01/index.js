@@ -13,46 +13,9 @@
 
 import './assets/styles.css'
 import { useState } from 'react'
-import { parseValue } from './utils'
+import { DISCOUNTRULES, MOVIES, parseValue } from './utils'
 
 export default function Exercise01 () {
-  const movies = [
-    {
-      id: 1,
-      name: 'Star Wars',
-      price: 20
-    },
-    {
-      id: 2,
-      name: 'Minions',
-      price: 25
-    },
-    {
-      id: 3,
-      name: 'Fast and Furious',
-      price: 10
-    },
-    {
-      id: 4,
-      name: 'The Lord of the Rings',
-      price: 5
-    }
-  ]
-
-  const discountRules = [
-    {
-      m: [3, 2],
-      discount: 0.25
-    },
-    {
-      m: [2, 4, 1],
-      discount: 0.5
-    },
-    {
-      m: [4, 2],
-      discount: 0.1
-    } 
-  ]
 
   const [cart, setCart] = useState([
     {
@@ -89,7 +52,7 @@ export default function Exercise01 () {
   
   const getDiscountCart = () => {
     const cartIds = cart.map((item) => item.id);
-    const discount = searchDiscount(cartIds, discountRules);
+    const discount = searchDiscount(cartIds, DISCOUNTRULES);
     const formatDiscount = +(parseValue(discount));
     return parseValue(formatDiscount * getTotal());
   }
@@ -145,7 +108,7 @@ export default function Exercise01 () {
     <section className="exercise01">
       <div className="movies__list">
         <ul>
-          {movies.map(mov => (
+          {MOVIES.map(mov => (
             <li className="movies__list-card">
               <ul>
                 <li>

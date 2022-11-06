@@ -14,63 +14,112 @@
 
 import "./assets/styles.css";
 import { useEffect, useState } from "react";
+import MovieGrid from "./components/MovieGrid";
+import { Grid } from '@material-ui/core';
+import { INITIALGENRESVALUE } from "./utils";
+import api from "./common/APIUtils";
+import { Spinner } from "./components/Spinner";
 
 export default function Exercise02 () {
   const [movies, setMovies] = useState([])
+  const [genres, setGenres] = useState([])
+  const [selectedGenres, setSelectedGenres] = useState(null)
+  const [isAscending, setIsAscending] = useState(true)
   const [fetchCount, setFetchCount] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  const handleMovieFetch = () => {
-    setLoading(true)
-    setFetchCount(fetchCount + 1)
-    console.log('Getting movies')
-    fetch('http://localhost:3001/movies?_limit=50')
-      .then(res => res.json())
-      .then(json => {
-        setMovies(json)
-        setLoading(false)
-      })
-      .catch(() => {
-        console.log('Run yarn movie-api for fake api')
-      })
+
+  const handleFetchMovie = async () => {
+    try {
+      const order = isAscending ? 'asc' : 'desc';
+      setLoading(true)
+      setFetchCount(fetchCount + 1)
+      const {data} = selectedGenres // if exist some select genre the apply the filter to api
+        ? await api.get(`movies?_limit=50&_sort=year&_order=${order}&genres_like=${selectedGenres}`) 
+        : await api.get(`movies?_limit=10&_sort=year&_order=${order}`)
+      setMovies(data);
+    } catch (error) {
+      console.log('Complete Run yarn movie-api for this exercise')
+    } finally {
+      setLoading(false)
+      setFetchCount(0)
+    }
   }
 
+  const handleFetchGenre = async () => {
+    try {
+      const { data } = await api.get('genres');
+      setGenres(data);
+    } catch (error) {
+      console.log(error)
+    } 
+  }
+
+  const handleFilterGenre = async (event) => {
+    // service that let filter movies based in genre
+    try {
+     setSelectedGenres(event.target.value)
+      if(event.target.value !== INITIALGENRESVALUE){
+        setLoading(true)
+        setFetchCount(fetchCount + 1)
+        setMovies([])
+        const { data } = await api.get(`movies?genres_like=${event.target.value}`);
+        setMovies(data);
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+      setFetchCount(0)
+    }
+  }
   useEffect(() => {
-    handleMovieFetch()
-  }, [handleMovieFetch])
+    handleFetchGenre()
+    handleFetchMovie()
+  }, [isAscending])
+
+
+  const orderData = (e) => setIsAscending(!isAscending);
 
   return (
+    <div>
+      <div className="movie-background-screen" />
     <section className="movie-library">
       <h1 className="movie-library__title">
         Movie Library
       </h1>
       <div className="movie-library__actions">
-        <select name="genre" placeholder="Search by genre...">
-          <option value="genre1">Genre 1</option>
+        <select 
+          name="genre"
+          onChange={handleFilterGenre} 
+          value={selectedGenres} 
+          placeholder={INITIALGENRESVALUE} // set default value Search by genre
+        >
+            {genres.map((item, i) => ( 
+              <option key={`${item}${i}`}value={item}>{item}</option>
+            ))}
         </select>
-        <button>Order Descending</button>
+        <button 
+          onClick={e => orderData(e)}>
+            {`Year ${isAscending ? 'Ascending' : 'Descending'}`}
+          </button>
       </div>
       {loading ? (
         <div className="movie-library__loading">
           <p>Loading...</p>
-          <p>Fetched {fetchCount} times</p>
+          <Spinner />
         </div>
       ) : (
-        <ul className="movie-library__list">
-          {movies.map(movie => (
-            <li key={movie.id} className="movie-library__card">
-              <img src={movie.posterUrl} alt={movie.title} />
-              <ul>
-                <li>ID: {movie.id}</li>
-                <li>Title: {movie.title}</li>
-                <li>Year: {movie.year}</li>
-                <li>Runtime: {movie.runtime}</li>
-                <li>Genres: {movie.genres.join(', ')}</li>
-              </ul>
-            </li>
-          ))}
-        </ul>
+        <Grid rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+          <div className="movie-library__list">
+            <MovieGrid // component that contains all movies 
+              movies={movies}
+              isAscending={isAscending}
+              selectedGenres={selectedGenres}/>
+          </div>
+        </Grid>
       )}
     </section>
+    </div>
   )
 }

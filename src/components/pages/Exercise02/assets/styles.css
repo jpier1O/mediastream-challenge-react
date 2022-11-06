@@ -1,27 +1,66 @@
+.movie-background-screen {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  align-self: center;
+
+  background-image: linear-gradient(
+    rgba(252, 244, 244, 0),
+    rgba(0, 0, 0, 0.021),
+    rgb(0, 0, 0),
+    rgb(0, 0, 0),
+    rgb(0, 0, 0),
+    rgb(0, 0, 0)
+  );
+}
+
 .movie-library {
-  background-color: var(--black);
   color: var(--white);
   min-height: 100vh;
   padding: 2em;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position-y: -150px;
+  background-repeat: no-repeat;
+  background-image: url("./mountains.jpeg");
 }
 
 .movie-library__title {
-  font-size: 2em;
+  z-index: 500;
   margin-bottom: 1em;
+  font-size: 2em;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  display: block;
+  font-weight: bold;
 }
 
 .movie-library__actions {
+  background: transparent;
   display: flex;
   margin-bottom: 1em;
+  border-radius: 5px;
+  border: 1.5px rgb(95, 228, 19) solid;
+  background: rgb(92, 244, 5);
 }
 
 .movie-library__actions select {
+  z-index: 200;
   width: 100%;
-  padding: .25em;
+  padding: 0.25em;
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
 }
 
 .movie-library__actions button {
+  z-index: 200;
   white-space: nowrap;
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+  text-decoration: none;
+  border: none;
+  background: rgb(94, 255, 0);
+  padding: 0 20px;
 }
 
 .movie-library__loading {
@@ -30,28 +69,101 @@
   background-color: #222222;
   padding: 1.25em 0;
   margin: 2em 0;
+  z-index: 200;
 }
 
 .movie-library__list {
-  padding: 1em;
-  background-color: #222222;
+  background: transparent;
+  z-index: 200;
+  padding: 30px 0;
+  display: grid;
+  grid-template-columns: repeat(4, 2fr);
+  width: 100%;
+  margin: 0 auto;
+  grid-gap: 60px;
 }
 
 .movie-library__card {
+  z-index: 200;
   background-color: #333333;
   margin-bottom: 1em;
   display: flex;
-  align-items: center;
+  height: 420px;
+  width: 300px;
+  border-radius: 14px;
+
+}
+
+.movie-library__card .movie-library_card_background {
+  width: 300px;
+  height: 452px;
+  background-image: linear-gradient(
+    rgba(248, 248, 248, 0),
+    rgba(94, 255, 0, 0.219),
+    rgb(153, 241, 86)
+  );
+  position: absolute;
+  border-radius: 14px;
+}
+
+.movie-library_card_background_description {
+  column-gap: 20px;
+  align-items: flex-end;
+  padding: 372px 20px;
+  justify-content: space-between;
+  margin: 0 auto;
+}
+
+.movie-library_card_background_description li{
+  margin: 0 0 6px 0;
 }
 
 .movie-library__card img {
-  width: 10em;
+  border-radius: 14px;
 }
 
 .movie-library__card ul {
   padding: 1em;
+  position: absolute;
+  text-align: left;
+  justify-content: center;
+  align-items: center;
+  bottom: 0;
+  list-style-type: none;
 }
 
 .movie-library__card li {
-  line-height: 120%;
+  line-height: 100%;
+  list-style-type: none;
+}
+
+.movie-title {
+  color: white;
+  font-weight: bolder;
+  font-family: "Arial", sans-serif;
+  font-size: 16px;
+}
+
+.genres {
+  font-size: 12px;
+  font-family: "Arial", sans-serif;
+  color: white;
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.load-spinner {
+  width: 50px;
+  height: 50px;
+  border: 10px solid #f3f3f3;
+  border-top: 10px solid #383636; 
+  border-radius: 50%;
+  animation: spinner 1.5s linear infinite;
+  margin: 20px auto;
 }

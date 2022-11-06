@@ -13,6 +13,7 @@
 
 import './assets/styles.css'
 import { useState } from 'react'
+import { parseValue } from './utils'
 
 export default function Exercise01 () {
   const movies = [
@@ -62,26 +63,102 @@ export default function Exercise01 () {
     }
   ])
 
-  const getTotal = () => 0 // TODO: Implement this
+  const getTotal = () => parseValue(cart.reduce(
+    (total, item) => total + (item.price * item.quantity), 0
+  ))
+
+  const checkExistDiscount = (cartIds, discountArr) => {
+    const cartIdSort = cartIds.slice().sort();
+    const discountArrSort = discountArr.slice().sort();
+    return (JSON.stringify(cartIdSort) === JSON.stringify(discountArrSort));
+  }
+
+  const searchDiscount = (cartIds, discountArr) => {
+    let discount = 0;
+    for (let i = 0; i < cartIds.length; i++) {
+      for (let j = 0; j < discountArr.length; j++) {
+        if (checkExistDiscount(cartIds, discountArr[j].m)) {
+          discount = discountArr[j].discount;
+          break;
+        }
+      }
+    }
+    return discount;
+  };
+
+  
+  const getDiscountCart = () => {
+    const cartIds = cart.map((item) => item.id);
+    const discount = searchDiscount(cartIds, discountRules);
+    const formatDiscount = +(parseValue(discount));
+    return parseValue(formatDiscount * getTotal());
+  }
+
+  const getTotalWithDiscount = () => {
+   
+    const totalWithDiscount =  getTotal() - getDiscountCart();
+    return parseValue(totalWithDiscount)
+  }
+
+  const handleChangeCart = (item, n) => {
+    setCart((cart) =>
+      cart.flatMap((cartItem) =>
+        cartItem.id === item.id
+          ? cartItem.quantity + n < 1
+            ? [] // <-- remove item if amount will be less than 1
+            : [
+                {
+                  ...cartItem,
+                  quantity: cartItem.quantity + n
+                }
+              ]
+          : [cartItem]
+      )
+    );
+  }
+
+  const addToCart = (item) => {
+    // Update cart item quantity if already in cart
+    if (cart.some((cartItem) => cartItem.id === item.id)) {
+      setCart((cart) =>
+        cart.map((cartItem) =>
+          cartItem.id === item.id
+            ? {
+                ...cartItem,
+                quantity: cartItem.quantity + 1
+              }
+            : cartItem
+        )
+      );
+      return;
+    }
+
+
+    // Add item to cart
+    setCart((cart) => [
+      ...cart,
+      {...item, quantity: 1}
+    ])
+  }
 
   return (
     <section className="exercise01">
       <div className="movies__list">
         <ul>
-          {movies.map(o => (
+          {movies.map(mov => (
             <li className="movies__list-card">
               <ul>
                 <li>
-                  ID: {o.id}
+                  ID: {mov.id}
                 </li>
                 <li>
-                  Name: {o.name}
+                  Name: {mov.name}
                 </li>
                 <li>
-                  Price: ${o.price}
+                  Price: ${mov.price}
                 </li>
               </ul>
-              <button onClick={() => console.log('Add to cart', o)}>
+              <button onClick={() => addToCart(mov)}>
                 Add to cart
               </button>
             </li>
@@ -90,27 +167,27 @@ export default function Exercise01 () {
       </div>
       <div className="movies__cart">
         <ul>
-          {cart.map(x => (
+          {cart.map((cItem) => (
             <li className="movies__cart-card">
               <ul>
                 <li>
-                  ID: {x.id}
+                  ID: {cItem.id}
                 </li>
                 <li>
-                  Name: {x.name}
+                  Name: {cItem.name}
                 </li>
                 <li>
-                  Price: ${x.price}
+                  Price: ${cItem.price}
                 </li>
               </ul>
               <div className="movies__cart-card-quantity">
-                <button onClick={() => console.log('Decrement quantity', x)}>
+                <button onClick={() => handleChangeCart(cItem, -1)}>
                   -
                 </button>
                 <span>
-                  {x.quantity}
+                  {cItem.quantity}
                 </span>
-                <button onClick={() => console.log('Increment quantity', x)}>
+                <button onClick={() => handleChangeCart(cItem, 1)}>
                   +
                 </button>
               </div>
@@ -118,7 +195,13 @@ export default function Exercise01 () {
           ))}
         </ul>
         <div className="movies__cart-total">
-          <p>Total: ${getTotal()}</p>
+          <p>Subtotal: ${getTotal()}</p>
+        </div>
+        <div className={+getDiscountCart() === 0 ? "movies__cart-total" : "movies__cart-discount"}>
+          <p>Discount: {+getDiscountCart() > 0 ? '-': ''}${getDiscountCart()}</p>
+        </div>
+        <div className="movies__cart-total">
+          <p>Estimated Total: ${getTotalWithDiscount()}</p>
         </div>
       </div>
     </section>

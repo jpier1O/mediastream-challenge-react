@@ -72,6 +72,10 @@
   z-index: 200;
 }
 
+.movie-library_card_background img{
+  max-height: 45px;
+}
+
 .movie-library__list {
   background: transparent;
   z-index: 200;
@@ -96,7 +100,7 @@
 
 .movie-library__card .movie-library_card_background {
   width: 300px;
-  height: 452px;
+  height: 450px;
   background-image: linear-gradient(
     rgba(248, 248, 248, 0),
     rgba(94, 255, 0, 0.219),
@@ -120,6 +124,9 @@
 
 .movie-library__card img {
   border-radius: 14px;
+  height: auto;
+  width: auto;
+  max-height: 445px;
 }
 
 .movie-library__card ul {
